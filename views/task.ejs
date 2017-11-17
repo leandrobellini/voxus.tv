@@ -1,0 +1,45 @@
+<!-- =================== Header =================== -->
+<%  include ./partials/header %>
+<!-- =================== /Header =================== -->
+
+
+<div class="container top-margin">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <% if(task == -1){ %>
+                <b>Task inválida!</b>
+            <% }else{ %>
+                
+                <form>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Nome</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="nome" value="<%= task.nome %>">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Descrição</label>
+                        <div class="col-sm-10">
+                                <textarea class="form-control" rows="4" name="descricao"><%= task.descricao %></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Prioridade</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="prioridade">
+                                    <option><%= task.prioridade %></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <a href="/" class="btn btn-warning btn-sm">Voltar</a>
+                </form>
+            <% }%>
+        </div>
+    </div>
+</div>
+
+
+<!-- =================== Footer =================== -->
+<% include ./partials/footer %>
+<!-- =================== /Footer =================== -->
