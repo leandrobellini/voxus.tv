@@ -1,17 +1,39 @@
 var express         = require("express"),
 app                 = express(),
 bodyParser          = require("body-parser"),
-methodOverride      = require("method-override");
-GoogleStrategy      = require('passport-google-oauth').OAuth2Strategy;
+methodOverride      = require("method-override"),
+googleStrategy      = require('passport-google-oauth').OAuth2Strategy,
+passport            = require('passport');
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+  
+passport.deserializeUser(function(obj, done) {
+    done(null, obj);
+});
+
+passport.use(new googleStrategy({
+    clientID      : '184699945326-5pl6a4tlsd99h73pi3roov07igpmvc7v.apps.googleusercontent.com',
+    clientSecret  : 'K2BxzV4t2z-bWtdAQs7yK8m8',
+    callbackURL   : 'http://localhost:8080/auth/google/callback',
+    passReqToCallback: true
+    },
+    function(request, accessToken, refreshToken, profile, done) {
+      process.nextTick(function () {
+        return done(null, profile);
+      });
+    }
+));
 
 //app config
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
+app.use( passport.initialize());
 
-//auth
-var configAuth = require('./auth');
+var logado = 0;
 
 var tasks = [
         {
@@ -32,7 +54,37 @@ var tasks = [
             prioridade: 1, 
             usuario: "Leandro"
         }
-    ];
+];
+
+app.get('/auth/google', 
+    passport.authenticate('google',{scope: ['profile', 'email']})
+);
+
+app.get('/auth/google/callback', function(req, res) {
+    logado = 1;
+
+    res.redirect("/");
+});
+
+
+app.get('/logout', function (req, res) {
+        logado = 0;
+        res.redirect('/');
+});
+
+app.get('/login', function (req, res) {
+    res.render("login");
+});
+
+function isLoggedIn(req, res, next) {
+    
+    if (logado == 1)
+        return next();
+
+    res.redirect('/login');
+}
+
+app.use(isLoggedIn);
 
 app.get("/", function(req, res) {
     res.render("index", {tasks: tasks});
